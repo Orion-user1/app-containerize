@@ -7,7 +7,7 @@ pipeline:
   clone:
     enabled: true
     connector: connector_Github_5257
-    repo: Orion-user1/Test-app-repo
+    repo: Orion-user1/app-containerize
     ref:
       type: branch
       name: main
