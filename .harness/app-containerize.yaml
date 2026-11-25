@@ -1,79 +1,57 @@
 pipeline:
-  name: App Containerize
-  identifier: cicd_app_containerize
-  description: Containerize applications with security validation and signing
-
+  id: java_ci_remote
+  name: java_ci_remote
+  description: CI pipeline for a Java Maven app with lint, secret scan, dependency install, build, unit test, SAST and SCA.
+  tags:
+    ai_generated: ""
+  clone:
+    enabled: true
+    connector: connector_Github_5257
+    repo: Orion-user1/Test-app-repo
+    ref:
+      type: branch
+      name: main
   stages:
-    - stage:
-        name: App Containerize
-        identifier: app_containerize
-        type: CI
-
-        spec:
-          cloneCodebase: true
-
-          execution:
-            steps:
-              - step:
-                  type: Run
-                  name: Container file lint
-                  identifier: container_file_lint
-                  spec:
-                    shell: Bash
-                    command: python3 devops-automation/scripts/container_file_lint.py
-
-              - step:
-                  type: Run
-                  name: Create Image
-                  identifier: create_image
-                  spec:
-                    shell: Bash
-                    command: python3 devops-automation/scripts/create_image.py
-
-              - step:
-                  type: Run
-                  name: SCA Scan on Image
-                  identifier: sca_scan_image
-                  spec:
-                    shell: Bash
-                    command: python3 devops-automation/scripts/blackduck_image_scan.py
-
-              - step:
-                  type: Run
-                  name: Vulnerability Check
-                  identifier: vulnerability_check
-                  spec:
-                    shell: Bash
-                    command: python3 devops-automation/scripts/vulnerability_check.py
-
-              - step:
-                  type: Run
-                  name: Create SBOM
-                  identifier: create_sbom
-                  spec:
-                    shell: Bash
-                    command: python3 devops-automation/scripts/create_sbom.py
-
-              - step:
-                  type: Run
-                  name: Publish Image
-                  identifier: publish_image
-                  spec:
-                    shell: Bash
-                    command: python3 devops-automation/scripts/publish_image.py
-
-              - step:
-                  type: Run
-                  name: Record Image Digest
-                  identifier: record_image_digest
-                  spec:
-                    shell: Bash
-                    command: python3 devops-automation/scripts/create_image_digest.py
-
-              - step:
-                  type: Run
-                  name: Image and Digest attestation
-                  identifier: image_digest_attestation
-                  spec:
-                    shell: Bash
-                    command: python3 devops-automation/scripts/cosign_attestation.py
+    - id: java_ci_stage
+      name: Java CI
+      runtime: cloud
+      platform:
+        os: linux
+        arch: amd64
+      steps:
+        - id: lint
+          name: Lint
+          run:
+            container:
+              image: maven:3.9-eclipse-temurin-17
+            script: mvn -B checkstyle:check
+        - id: secret_scan
+          name: Secret Scan
+          template:
+            uses: gitleaksStep
+        - id: install_dependencies
+          name: Install Dependencies
+          run:
+            container:
+              image: maven:3.9-eclipse-temurin-17
+            script: mvn -B dependency:resolve
+        - id: build
+          name: Build Application
+          run:
+            container:
+              image: maven:3.9-eclipse-temurin-17
+            script: mvn -B package -DskipTests
+        - id: unit_test
+          name: Unit Test
+          run-test:
+            container:
+              image: maven:3.9-eclipse-temurin-17
+            script: mvn -B test
+        - id: sast_scan
+          name: SAST Scan
+          template:
+            uses: semgrepStep
+        - id: sca_scan
+          name: SCA Scan
+          template:
+            uses: osvStep
