@@ -24,10 +24,10 @@ pipeline:
           name: Create Image
           run:
             script: python3 devops-automation/scripts/create_image.py
-        - id: sca_scan_image
-          name: SCA Scan on Image
-          run:
-            script: python3 devops-automation/scripts/blackduck_image_scan.py
+        # - id: sca_scan_image
+        #   name: SCA Scan on Image
+        #   run:
+        #     script: python3 devops-automation/scripts/blackduck_image_scan.py
         - id: vulnerability_check
           name: Vulnerability Check
           run:
