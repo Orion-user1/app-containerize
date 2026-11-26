@@ -1,7 +1,6 @@
 pipeline:
   description: Containerize applications with security validation and signing
-  tags:
-    ai_generated: ""
+  
   clone:
     enabled: true
     connector: connector_Github_3a28
