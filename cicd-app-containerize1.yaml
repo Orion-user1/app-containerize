@@ -1,5 +1,51 @@
 pipeline:
+  description: Containerize applications with security validation and signing
+  tags:
+    ai_generated: ""
+  clone:
+    enabled: true
+    connector: connector_Github_3a28
+    repo: Orion-user1/app-containerize
+    ref:
+      type: branch
+      name: main
   stages:
-    - steps:
-        - run:
-            script: echo "hello world"
+    - id: app_containerize
+      name: App Containerize
+      runtime: cloud
+      platform:
+        os: linux
+        arch: amd64
+      steps:
+        - id: container_file_lint
+          name: Container file lint
+          run:
+            script: python3 devops-automation/scripts/container_file_lint.py
+        - id: create_image
+          name: Create Image
+          run:
+            script: python3 devops-automation/scripts/create_image.py
+        - id: sca_scan_image
+          name: SCA Scan on Image
+          run:
+            script: python3 devops-automation/scripts/blackduck_image_scan.py
+        - id: vulnerability_check
+          name: Vulnerability Check
+          run:
+            script: python3 devops-automation/scripts/vulnerability_check.py
+        - id: create_sbom
+          name: Create SBOM
+          run:
+            script: python3 devops-automation/scripts/create_sbom.py
+        - id: publish_image
+          name: Publish Image
+          run:
+            script: python3 devops-automation/scripts/publish_image.py
+        - id: record_image_digest
+          name: Record Image Digest
+          run:
+            script: python3 devops-automation/scripts/create_image_digest.py
+        - id: image_digest_attestation
+          name: Image and Digest attestation
+          run:
+            script: python3 devops-automation/scripts/cosign_attestation.py
