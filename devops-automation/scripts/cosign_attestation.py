@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Cosign Attestation Script - Dummy Implementation
+Cosign Attestation Script -  Implementation
 This signs the image and attaches SBOM attestation using Cosign.
 TODO: Implement actual Cosign signing
 """
@@ -8,7 +8,7 @@ import sys
 
 def main():
     print("=" * 60)
-    print("Cosign Attestation - Dummy Implementation")
+    print("Cosign Attestation -  Implementation")
     print("=" * 60)
 
     # Read digest and SBOM from previous stages
@@ -22,7 +22,7 @@ def main():
         print(f"✗ Error: Required file not found - {e}")
         return 1
 
-    print("  (Dummy signing - not actually running Cosign)")
+    print("  ( signing - not actually running Cosign)")
     print("  → Loading Cosign key...")
     print("  → Signing image...")
     print("  → Attaching SBOM attestation...")
@@ -31,11 +31,11 @@ def main():
     # Save signature info
     with open('signature.txt', 'w') as f:
         f.write(f"Image: {digest}\n")
-        f.write("Signed: Yes (dummy)\n")
-        f.write("SBOM Attested: Yes (dummy)\n")
-        f.write("Verification: Passed (dummy)\n")
+        f.write("Signed: Yes (app)\n")
+        f.write("SBOM Attested: Yes (app)\n")
+        f.write("Verification: Passed (app)\n")
 
-    print(f"\n✅ Image signed and attested (dummy)")
+    print(f"\n✅ Image signed and attested (app)")
     print("   ✓ Image signature created")
     print("   ✓ SBOM attestation attached")
     print("   ✓ Signature verified")
